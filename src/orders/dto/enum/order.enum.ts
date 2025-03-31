@@ -1,0 +1,18 @@
+export enum OrderStatus {
+    PENDING = 'PENDING',
+    INVENTORY_APPROVED = 'INVENTORY_APPROVED',
+    INVENTORY_REJECTED = 'INVENTORY_REJECTED',
+    DELIVERY_CREATED = 'DELIVERY_CREATED',
+    DELIVERED = 'DELIVERED',
+    CANCELLED = 'CANCELLED',
+}
+
+export const OrderStatusList = [
+    OrderStatus.PENDING,
+    OrderStatus.INVENTORY_APPROVED,
+    OrderStatus.INVENTORY_REJECTED,
+    OrderStatus.DELIVERY_CREATED,
+    OrderStatus.DELIVERED,
+    OrderStatus.CANCELLED,
+
+]

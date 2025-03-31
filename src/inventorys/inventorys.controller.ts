@@ -1,25 +1,25 @@
-import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
 import { PaginationDto } from 'src/common';
-import { INVENTORY_SERVICE } from 'src/config';
+import { NATS_SERVICE } from 'src/config';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 
 @Controller('inventory')
 export class InventorysController {
   constructor(
-    @Inject(INVENTORY_SERVICE) private readonly inventoryClient: ClientProxy,
+    @Inject(NATS_SERVICE) private readonly client: ClientProxy,
   ) { }
 
   @Post()
   createInventory(@Body() createInventoryDto: CreateInventoryDto) {
-    return this.inventoryClient.send({ cmd: 'create_inventory' }, createInventoryDto)
+    return this.client.send({ cmd: 'create_inventory' }, createInventoryDto)
   }
 
   @Get()
   findAllInventories(@Query() paginationDto: PaginationDto) {
-    return this.inventoryClient.send({ cmd: 'find_all_inventory' }, paginationDto)
+    return this.client.send({ cmd: 'find_all_inventory' }, paginationDto)
   }
 
   @Get(':id')
@@ -29,7 +29,7 @@ export class InventorysController {
 
       // it's an observable, if it does not generate an error it returns the product
       const product = await firstValueFrom(
-        this.inventoryClient.send({ cmd: 'find_one_inventory' }, { id })
+        this.client.send({ cmd: 'find_one_inventory' }, { id })
       );
       return product;
 
@@ -40,7 +40,7 @@ export class InventorysController {
 
   @Delete(':id')
   deleteOneInventories(@Param('id', ParseIntPipe) id: number) {
-    return this.inventoryClient.send({ cmd: 'delete_inventory' }, { id }).pipe(
+    return this.client.send({ cmd: 'delete_inventory' }, { id }).pipe(
       catchError(err => { throw new RpcException(err) })
     )
   }
@@ -49,7 +49,7 @@ export class InventorysController {
   updateOneInventories(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateInventoryDto: UpdateInventoryDto) {
-    return this.inventoryClient.send({ cmd: 'update_inventory' }, {
+    return this.client.send({ cmd: 'update_inventory' }, {
       id,
       ...updateInventoryDto
     }).pipe(
